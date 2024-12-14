@@ -1,6 +1,6 @@
 # `pausable-udt`
 >
-> [[EN/CN] Script-Sourced Rich Information - 来源于 Script 的富信息](https://talk.nervos.org/t/en-cn-script-sourced-rich-information-script/8256): General introduction to SSRI.
+> [`[EN/CN] Script-Sourced Rich Information - 来源于 Script 的富信息`](https://talk.nervos.org/t/en-cn-script-sourced-rich-information-script/8256): General introduction to SSRI.
 >
 > [`pausable-udt`](https://github.com/Alive24/pausable-udt): The first fully SSRI compliant and production ready contract that exemplifies all use cases that SSRI protocool covers.
 >
