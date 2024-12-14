@@ -1,4 +1,16 @@
 # `pausable-udt`
+>
+> [[EN/CN] Script-Sourced Rich Information - 来源于 Script 的富信息](https://talk.nervos.org/t/en-cn-script-sourced-rich-information-script/8256): General introduction to SSRI.
+>
+> [`pausable-udt`](https://github.com/Alive24/pausable-udt): The first fully SSRI compliant and production ready contract that exemplifies all use cases that SSRI protocool covers.
+>
+> [`ssri-server`](https://github.com/ckb-devrel/ssri-server): Server for calling SSRI methods.
+>
+> [`ckb_ssri_sdk`](https://github.com/Alive24/ckb_ssri_sdk) : Toolkit to help developers build SSRI-Compliant smart contracts on CKB by providing public Module Traits which would receive first party infrastructure support across the ecosystem, such as CKB Explorer, JoyID wallet, etc, and useful utility functions and macros to simplify the experience of building SSRI-Compliant contract.
+>
+> [`ckb_ssri_cli`](https://github.com/Alive24/ckb_ssri_cli): Command Line Interface for general users, moderators, and devs to interact with SSRI-Compliant Contracts deployed on CKB Network. Also exemplifies how to interact with SSRI compliant contract in Node.js.
+>
+> [`ssri-test`](https://github.com/Hanssen0/ssri-test): First prototype of SSRI-Compliant contract.
 
 This is a SSRI-compliant smart contract that implements a pausable UDT (User-Defined Token) with the SSRI protocol. By maintaining and referring to the `UDTPausableData` , transactions involving UDT would in effect pause minting, transferring, and burning behaviors when any paused lock hash is involved in the transaction. Moreover, the pause list would be publicly accessible and readable to the general public for any decentralized financial arrangements.
 
@@ -10,9 +22,18 @@ Pausable UDT is one of the urgent demands of the market that would be good examp
 
 Based on the experience and insights, as well as the latest updates of utilities and framework including `SSRI`, we would want to design Pausable UDT in a way that is public, intuitive, predicable, and indeed extensible, and develop it in a way that both promises security and functionalities of `Pausable UDT` in the first place and exemplify a more reliable and intuitive way of building smart contracts on CKB-VM.
 
+## Quick Note on SSRI
+
+SSRI stands for `Script Sourced Rich Information`; it is a protocol for strong bindings of relevant information and conventions to the Script itself on CKB. For more information, please read [[EN/CN] Script-Sourced Rich Information - 来源于 Script 的富信息](https://talk.nervos.org/t/en-cn-script-sourced-rich-information-script/8256).
+
+Such bindings would take place in a progressive pattern:
+1. On the level of validating transactions, by specifically using Rust Traits, we recognize the purpose (or more specifically, the `Intent` of running the script) (e.g., `minting UDT`, `transferring`) and build relevant validation logics within the scope of the corresponding method.
+2. On the level of reading and organizing contract code, by selectively implementing methods of public module traits (e.g. `UDT`, `UDTPausable`) in combinations, generic users and devs would be able to quickly understand and organize functionalities of contracts as well as the relevant adaptations / integrations in dApps , especially in use cases involving multiple distinct contracts (and very likely from different projects) within same transactions.
+3. On the level of dApp integration and interactions with `ckb_ssri_cli`, SSRI-Compliant contracts provide predictable interfaces for information query (e.g. generic metadata source for explorer, CCC integration for pubic trait methods such as UDT), transaction generation/completion, and output data calculations which reduces engineering workload significantly by sharing code effectively.
+
 ## Interfaces
 
-We will be implementing public module traits `UDT`defined in `ckb_ssri_sdk` . This would be the basis of code organizing, public presenting, and generic integrations to dApps at the moment, and method reflections for SSRI-Calling in the future.
+We will be implementing public module traits `UDT` defined in `ckb_ssri_sdk` . This would be the basis of code organizing, public presenting, and generic integrations to dApps at the moment, and method reflections for SSRI-Calling in the future.
 
 - For methods that we do not plan to implement, we will just simply return `SSRIError::SSRIMethodsNotImplemented` .
 - Methods that corresponds to a behavior (e.g. mint, transfer) would return an incomplete `Transaction` while you need to fill in the missing inputs and `CellDeps` with CCC. It can also be provided in the parameters in a way that allows chaining multiple actions.
