@@ -11,10 +11,10 @@ use ckb_ssri_sdk::utils::should_fallback;
 // use ckb_ssri_sdk_proc_macro::{ssri_method, ssri_module};
 use ckb_std::ckb_constants::Source;
 use ckb_std::ckb_types::packed::{
-    Byte, Byte32, BytesVec, BytesVecBuilder, CellDep, CellDepVec, CellDepVecBuilder, CellInput,
-    CellInputBuilder, CellInputVecBuilder, CellOutput, CellOutputBuilder, CellOutputVecBuilder,
-    RawTransactionBuilder, Script, ScriptBuilder, ScriptOptBuilder, Transaction,
-    TransactionBuilder, Uint64,
+    Byte, Byte32, Byte32Vec, BytesVec, BytesVecBuilder, CellDep, CellDepVec, CellDepVecBuilder,
+    CellInput, CellInputBuilder, CellInputVec, CellInputVecBuilder, CellOutput, CellOutputBuilder,
+    CellOutputVec, CellOutputVecBuilder, RawTransactionBuilder, Script, ScriptBuilder,
+    ScriptOptBuilder, Transaction, TransactionBuilder, Uint32, Uint64,
 };
 use ckb_std::ckb_types::{bytes::Bytes, prelude::*};
 use ckb_std::debug;
@@ -84,6 +84,7 @@ impl UDT for PausableUDT {
         };
         for pausable_data in pausable_data_vec {
             let next_type_script_like = pausable_data.next_type_script;
+            debug!("Next type script like: {:?}", next_type_script_like);
             if next_type_script_like.is_none() {
                 break;
             }
@@ -109,15 +110,31 @@ impl UDT for PausableUDT {
         Ok(tx_builder
             .raw(
                 raw_tx_builder
-                    .version(tx.clone().should_be_ok().raw().version())
+                    .version(
+                        tx.clone()
+                            .map(|t| t.raw().version())
+                            .unwrap_or_else(|| Uint32::default()),
+                    )
                     .cell_deps(cell_dep_vec_builder.build())
-                    .header_deps(tx.clone().should_be_ok().raw().header_deps())
-                    .inputs(tx.clone().should_be_ok().raw().inputs())
+                    .header_deps(
+                        tx.clone()
+                            .map(|t| t.raw().header_deps())
+                            .unwrap_or_else(|| Byte32Vec::default()),
+                    )
+                    .inputs(
+                        tx.clone()
+                            .map(|t| t.raw().inputs())
+                            .unwrap_or_else(|| CellInputVec::default()),
+                    )
                     .outputs(cell_output_vec_builder.build())
                     .outputs_data(outputs_data_builder.build())
                     .build(),
             )
-            .witnesses(tx.clone().should_be_ok().witnesses())
+            .witnesses(
+                tx.clone()
+                    .map(|t| t.witnesses())
+                    .unwrap_or_else(|| BytesVec::default()),
+            )
             .build())
     }
 
@@ -228,13 +245,30 @@ impl UDT for PausableUDT {
         Ok(tx_builder
             .raw(
                 raw_tx_builder
-                    .version(tx.clone().should_be_ok().raw().version())
+                    .version(
+                        tx.clone()
+                            .map(|t| t.raw().version())
+                            .unwrap_or_else(|| Uint32::default()),
+                    )
                     .cell_deps(cell_dep_vec_builder.build())
-                    .header_deps(tx.clone().should_be_ok().raw().header_deps())
-                    .inputs(tx.clone().should_be_ok().raw().inputs())
+                    .header_deps(
+                        tx.clone()
+                            .map(|t| t.raw().header_deps())
+                            .unwrap_or_else(|| Byte32Vec::default()),
+                    )
+                    .inputs(
+                        tx.clone()
+                            .map(|t| t.raw().inputs())
+                            .unwrap_or_else(|| CellInputVec::default()),
+                    )
                     .outputs(cell_output_vec_builder.build())
                     .outputs_data(output_data_vec_builder.build())
                     .build(),
+            )
+            .witnesses(
+                tx.clone()
+                    .map(|t| t.witnesses())
+                    .unwrap_or_else(|| BytesVec::default()),
             )
             .build())
     }
@@ -324,13 +358,17 @@ impl UDTPausable for PausableUDT {
                             .build();
                         let last_cell_out_point = find_out_point_by_type(last_cell_type_script)?;
                         new_cell_output = find_cell_by_out_point(last_cell_out_point.clone())?;
-                        let last_cell_data = find_cell_data_by_out_point(last_cell_out_point.clone())?;
+                        let last_cell_data =
+                            find_cell_data_by_out_point(last_cell_out_point.clone())?;
                         let mut pausable_data: UDTPausableData =
                             from_slice(&last_cell_data, false)?;
                         pausable_data.pause_list.extend(lock_hashes.clone());
                         new_output_data = pausable_data;
-                        new_cell_input =
-                            Some(CellInput::new_builder().previous_output(last_cell_out_point).build());
+                        new_cell_input = Some(
+                            CellInput::new_builder()
+                                .previous_output(last_cell_out_point)
+                                .build(),
+                        );
                     }
                 }
             }
@@ -366,15 +404,31 @@ impl UDTPausable for PausableUDT {
         return Ok(tx_builder
             .raw(
                 raw_tx_builder
-                    .version(tx.clone().should_be_ok().raw().version())
-                    .cell_deps(tx.clone().should_be_ok().raw().cell_deps())
-                    .header_deps(tx.clone().should_be_ok().raw().header_deps())
+                    .version(
+                        tx.clone()
+                            .map(|t| t.raw().version())
+                            .unwrap_or_else(|| Uint32::default()),
+                    )
+                    .cell_deps(
+                        tx.clone()
+                            .map(|t| t.raw().cell_deps())
+                            .unwrap_or_else(|| CellDepVec::default()),
+                    )
+                    .header_deps(
+                        tx.clone()
+                            .map(|t| t.raw().header_deps())
+                            .unwrap_or_else(|| Byte32Vec::default()),
+                    )
                     .inputs(input_vec_builder.build())
                     .outputs(cell_output_vec_builder.build())
                     .outputs_data(output_data_vec_builder.build())
                     .build(),
             )
-            .witnesses(BytesVec::default())
+            .witnesses(
+                tx.clone()
+                    .map(|t| t.witnesses())
+                    .unwrap_or_else(|| BytesVec::default()),
+            )
             .build());
     }
 
@@ -467,15 +521,31 @@ impl UDTPausable for PausableUDT {
         return Ok(tx_builder
             .raw(
                 raw_tx_builder
-                    .version(tx.clone().should_be_ok().raw().version())
-                    .cell_deps(tx.clone().should_be_ok().raw().cell_deps())
-                    .header_deps(tx.clone().should_be_ok().raw().header_deps())
+                    .version(
+                        tx.clone()
+                            .map(|t| t.raw().version())
+                            .unwrap_or_else(|| Uint32::default()),
+                    )
+                    .cell_deps(
+                        tx.clone()
+                            .map(|t| t.raw().cell_deps())
+                            .unwrap_or_else(|| CellDepVec::default()),
+                    )
+                    .header_deps(
+                        tx.clone()
+                            .map(|t| t.raw().header_deps())
+                            .unwrap_or_else(|| Byte32Vec::default()),
+                    )
                     .inputs(input_vec_builder.build())
                     .outputs(cell_output_vec_builder.build())
                     .outputs_data(output_data_vec_builder.build())
                     .build(),
             )
-            .witnesses(BytesVec::default())
+            .witnesses(
+                tx.clone()
+                    .map(|t| t.witnesses())
+                    .unwrap_or_else(|| BytesVec::default()),
+            )
             .build());
     }
 
@@ -484,17 +554,65 @@ impl UDTPausable for PausableUDT {
         debug!("Entered is_paused");
         debug!("lock_hashes: {:?}", lock_hashes);
 
-        let pausable_data_vec: Vec<UDTPausableData> = Self::enumerate_paused(0, 0)?;
-        debug!("pausable_data_vec: {:?}", pausable_data_vec);
-        for pausable_data in pausable_data_vec {
-            if pausable_data
+        let mut current_pausable_data = get_pausable_data()?;
+        let mut seen_type_hashes: Vec<Byte32> = Vec::new();
+
+        loop {
+            // Check current pausable data's pause list
+            if current_pausable_data
                 .pause_list
-                .into_iter()
-                .any(|x| lock_hashes.contains(&x))
+                .iter()
+                .any(|x| lock_hashes.contains(x))
             {
                 return Ok(true);
             }
+
+            // Check for next type script in the chain
+            match current_pausable_data.next_type_script {
+                Some(next_type_script) => {
+                    let next_type_script = Script::new_builder()
+                        .code_hash(next_type_script.code_hash.pack())
+                        .hash_type(Byte::new(next_type_script.hash_type))
+                        .args(next_type_script.args.pack())
+                        .build();
+
+                    // Prevent infinite loops
+                    if seen_type_hashes.contains(&next_type_script.calc_script_hash()) {
+                        return Err(Error::CyclicPauseList);
+                    }
+                    seen_type_hashes.push(next_type_script.calc_script_hash());
+
+                    // Load next pausable data
+                    current_pausable_data = match should_fallback()? {
+                        true => {
+                            // Fallback logic to find next pausable data in cell deps
+                            let mut index = 0;
+                            loop {
+                                match load_cell_type(index, Source::CellDep) {
+                                    Ok(Some(next_pausable_cell_type_script))
+                                        if next_pausable_cell_type_script == next_type_script =>
+                                    {
+                                        break from_slice(
+                                            &load_cell_data(index, Source::CellDep)?,
+                                            false,
+                                        )?
+                                    }
+                                    Ok(Some(_)) | Ok(None) => index += 1,
+                                    Err(_) => return Err(Error::IncompletePauseList),
+                                }
+                            }
+                        }
+                        false => {
+                            // SSRI path to find next pausable data
+                            let next_out_point = find_out_point_by_type(next_type_script)?;
+                            from_slice(&find_cell_data_by_out_point(next_out_point)?, false)?
+                        }
+                    };
+                }
+                None => break, // No more pausable data cells
+            }
         }
+
         Ok(false)
     }
 

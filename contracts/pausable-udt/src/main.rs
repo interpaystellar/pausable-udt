@@ -49,20 +49,6 @@ pub fn get_pausable_data() -> Result<UDTPausableData, Error> {
         ]),
         // Type hash of another cell that also contains UDTPausableData
         // NOTE: External pause list used for testing purpose. It pauses ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgtlcnzzna2tqst7jw78egjpujn7hdxpackjmmdp ("0xd19228c64920eb8c3d79557d8ae59ee7a14b9d7de45ccf8bafacf82c91fc359e")
-        // next_type_hash: Some(
-        //     decode_hex(
-        //         &CString::new("0xddb008f52941d5aaab99aa56bd928a4ad0c5d11ae79c6c2b0dd065540a1cc89a")
-        //             .map_err(|_| Error::InvalidPauseData)?
-        //             .as_c_str()[2..],
-        //     )?
-        //     .try_into()
-        //     .map_err(|_| Error::InvalidPauseData)?,
-        // ),
-        // next_type_args: decode_hex(
-        //     &CString::new("0x1fccb60894d3ffbe1fc5640aca74e4283c3e1fd68ef037e2528af7b24f114931")
-        //         .map_err(|_| Error::InvalidPauseData)?
-        //         .as_c_str()[2..],
-        // )?
         next_type_script: Some(ScriptLike {
             code_hash: decode_hex(
                 &CString::new("0x00000000000000000000000000000000000000000000000000545950455f4944")
@@ -76,17 +62,7 @@ pub fn get_pausable_data() -> Result<UDTPausableData, Error> {
                     .as_c_str()[2..],
             )?,
             hash_type: 1u8.into(),
-        }), // ScriptBuilder::default()
-            //     .args(Bytes::from_compatible_slice(&decode_hex(
-            //         &CString::new("0xeaeb071fc556c96f082141c6332cc92b3c23cbfa30969d477408e65d27715429")
-            //             .map_err(|_| Error::InvalidPauseData)?
-            //             .as_c_str()[2..],
-            //     )?)?)
-            //     .code_hash(Byte32::from_compatible_slice(&decode_hex(
-            //         &CString::new("0x00000000000000000000000000000000000000000000000000545950455f4944")
-            //             .map_err(|_| Error::InvalidPauseData)?
-            //             .as_c_str()[2..],
-            //     )?)?),
+        })
     })
 }
 
@@ -144,7 +120,7 @@ fn program_entry_wrap() -> Result<(), Error> {
             }
 
             let tx: Option<Transaction>;
-            if argv[1].is_empty() {
+            if argv[1].as_ref().to_str()? == "" {
                 tx = None;
             } else {
                 let parsed_tx: Transaction = Transaction::from_compatible_slice(&decode_hex(argv[1].as_ref())?).map_err(|_|Error::MoleculeVerificationError)?;
@@ -176,7 +152,7 @@ fn program_entry_wrap() -> Result<(), Error> {
             }
 
             let tx: Option<Transaction>;
-            if argv[1].is_empty() {
+            if argv[1].as_ref().to_str()? == ""{
                 tx = None;
             } else {
                 let parsed_tx: Transaction = Transaction::from_compatible_slice(&decode_hex(argv[1].as_ref())?).map_err(|_|Error::MoleculeVerificationError)?;
@@ -195,7 +171,7 @@ fn program_entry_wrap() -> Result<(), Error> {
             }
 
             let tx: Option<Transaction>;
-            if argv[1].is_empty() {
+            if argv[1].as_ref().to_str()? == ""{
                 tx = None;
             } else {
                 let parsed_tx: Transaction = Transaction::from_compatible_slice(&decode_hex(argv[1].as_ref())?).map_err(|_|Error::MoleculeVerificationError)?;
@@ -214,7 +190,7 @@ fn program_entry_wrap() -> Result<(), Error> {
             }
 
             let tx: Option<Transaction>;
-            if argv[1].is_empty() {
+            if argv[1].as_ref().to_str()? == ""{
                 tx = None;
             } else {
                 let parsed_tx: Transaction = Transaction::from_compatible_slice(&decode_hex(argv[1].as_ref())?).map_err(|_|Error::MoleculeVerificationError)?;
