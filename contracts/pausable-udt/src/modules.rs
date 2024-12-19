@@ -3,7 +3,7 @@ use crate::get_pausable_data;
 use crate::utils::{check_owner_mode, collect_inputs_amount, collect_outputs_amount};
 use alloc::string::String;
 use alloc::vec::Vec;
-use ckb_ssri_sdk::public_module_traits::udt::{UDTPausable, UDTPausableData, UDT};
+use ckb_ssri_sdk::public_module_traits::udt::{UDTPausable, UDTPausableData, UDT, UDT_LEN};
 use ckb_ssri_sdk::utils::high_level::{
     find_cell_by_out_point, find_cell_data_by_out_point, find_out_point_by_type,
 };
@@ -28,7 +28,14 @@ impl UDT for PausableUDT {
     type Error = Error;
     // #[ssri_method(level = "code")]
     fn balance() -> Result<u128, Error> {
-        Err(Error::SSRIMethodsNotImplemented)
+        let data = load_cell_data(0, Source::GroupInput)?;
+        let mut buf = [0u8; UDT_LEN];
+        if data.len() == UDT_LEN {
+            buf.copy_from_slice(&data);
+            Ok(u128::from_le_bytes(buf))
+        } else {
+            Err(Error::Encoding)
+        }
     }
     // #[ssri_method(level = "code", transaction = true)]
     fn transfer(
