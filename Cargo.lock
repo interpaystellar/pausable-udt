@@ -89,9 +89,9 @@ dependencies = [
 
 [[package]]
 name = "ckb_ssri_sdk"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef8de7c71eae2dc2aae8b9fb7bf97f2db635f076b53550febd9424922c8f3895"
+checksum = "85fb51b7ae84531948cb5698a5ff46d3cbf3e36dcec8172cb5d5a6a97b4a0052"
 dependencies = [
  "ckb-std",
  "ckb_ssri_sdk_proc_macro",

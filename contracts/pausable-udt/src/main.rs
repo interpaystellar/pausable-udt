@@ -84,6 +84,7 @@ fn program_entry_wrap() -> Result<(), Error> {
         "UDT.symbol" => Ok(Cow::from(modules::PausableUDT::symbol()?.to_vec())),
         "UDT.decimals" => Ok(Cow::from(modules::PausableUDT::decimals()?.to_le_bytes().to_vec())),
         "UDT.balance" => Ok(Cow::from(modules::PausableUDT::balance()?.to_le_bytes().to_vec())),
+        "UDT.icon" => Ok(Cow::from(modules::PausableUDT::icon()?.to_vec())),
         "UDTPausable.is_paused" => {
             let response = modules::PausableUDT::is_paused(&decode_u8_32_vector(decode_hex(argv[1].as_ref())?).map_err(|_|error::Error::SSRIMethodsArgsInvalid)?)?;
             Ok(Cow::from(vec!(response as u8)))
