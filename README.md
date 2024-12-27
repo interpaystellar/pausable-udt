@@ -4,6 +4,7 @@
 >
 > [`pausable-udt`](https://github.com/Alive24/pausable-udt): The first fully SSRI compliant and production ready contract that exemplifies all use cases that SSRI protocool covers.
 >
+> [`pausable-udt` - Audit Report](https://github.com/Alive24/pausable-udt/blob/master/20241224-Pausable-UDT-Final-Audit-Report.pdf)
 >
 > [`ssri-server`](https://github.com/ckb-devrel/ssri-server): Server for calling SSRI methods.
 >
