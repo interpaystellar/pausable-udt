@@ -309,7 +309,7 @@ impl UDTPausable for PausableUDT {
         };
         let pausable_data_vec: Vec<UDTPausableData> = Self::enumerate_paused(0, 0)?;
 
-        let mut new_cell_output: CellOutput;
+        let new_cell_output: CellOutput;
         let new_output_data: UDTPausableData;
         let mut new_cell_input: Option<CellInput> = None;
         match load_cell(0, Source::GroupInput) {
@@ -455,7 +455,7 @@ impl UDTPausable for PausableUDT {
         let pausable_data_vec: Vec<UDTPausableData> = Self::enumerate_paused(0, 0)?;
 
         let mut new_cell_output: CellOutput;
-        let mut new_cell_input: Option<CellInput> = None;
+        let mut new_cell_input: Option<CellInput>;
         let mut output_data_vec_builder = match tx {
             Some(ref tx) => tx.clone().raw().outputs_data().as_builder(),
             None => BytesVecBuilder::default(),
@@ -670,7 +670,6 @@ impl UDTPausable for PausableUDT {
             match should_fallback()? {
                 true => {
                     let mut index = 0;
-                    let mut found = false;
                     let mut should_continue = true;
                     while should_continue {
                         match load_cell_type(index, Source::CellDep) {
@@ -680,7 +679,6 @@ impl UDTPausable for PausableUDT {
                                     next_pausable_cell_type_script
                                 );
                                 if next_pausable_cell_type_script == next_type_script {
-                                    found = true;
                                     should_continue = false;
                                     next_pausable_data = Some(from_slice(
                                         &load_cell_data(index, Source::CellDep)?,
