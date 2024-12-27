@@ -12,8 +12,7 @@ use ckb_ssri_sdk::utils::should_fallback;
 use ckb_std::ckb_constants::Source;
 use ckb_std::ckb_types::packed::{
     Byte, Byte32, Byte32Vec, BytesVec, BytesVecBuilder, CellDep, CellDepVec, CellDepVecBuilder,
-    CellInput, CellInputBuilder, CellInputVec, CellInputVecBuilder, CellOutput, CellOutputBuilder,
-    CellOutputVec, CellOutputVecBuilder, RawTransactionBuilder, Script, ScriptBuilder,
+    CellInput, CellInputVec, CellInputVecBuilder, CellOutput, CellOutputBuilder, CellOutputVecBuilder, RawTransactionBuilder, Script, ScriptBuilder,
     ScriptOptBuilder, Transaction, TransactionBuilder, Uint32, Uint64,
 };
 use ckb_std::ckb_types::{bytes::Bytes, prelude::*};
@@ -26,7 +25,7 @@ pub struct PausableUDT;
 // #[ssri_module]
 impl UDT for PausableUDT {
     type Error = Error;
-    // #[ssri_method(level = "code")]
+    // #[ssri_method(level = "cell")]
     fn balance() -> Result<u128, Error> {
         let data = load_cell_data(0, Source::GroupInput)?;
         let mut buf = [0u8; UDT_LEN];
@@ -83,7 +82,6 @@ impl UDT for PausableUDT {
             outputs_data_builder = outputs_data_builder.push(to_amount.pack().as_bytes().pack());
         }
 
-        // Prepare cell dep
         let pausable_data_vec: Vec<UDTPausableData> = Self::enumerate_paused(0, 0)?;
         let mut cell_dep_vec_builder: CellDepVecBuilder = match tx {
             Some(ref tx) => tx.clone().raw().cell_deps().as_builder(),
@@ -172,7 +170,7 @@ impl UDT for PausableUDT {
     fn decimals() -> Result<u8, Self::Error> {
         Ok(6u8)
     }
-    // #[ssri_method(level = "code", transaction = true)]
+    // #[ssri_method(level = "script", transaction = true)]
     fn mint(
         tx: Option<Transaction>,
         to_lock_vec: Vec<Script>,
@@ -219,7 +217,7 @@ impl UDT for PausableUDT {
         for data in new_output_data_vec {
             output_data_vec_builder = output_data_vec_builder.push(data.pack().as_bytes().pack());
         }
-        // Prepare cell dep
+
         let pausable_data_vec: Vec<UDTPausableData> = Self::enumerate_paused(0, 0)?;
         let mut cell_dep_vec_builder: CellDepVecBuilder = match tx {
             Some(ref tx) => tx.clone().raw().cell_deps().as_builder(),
@@ -444,7 +442,7 @@ impl UDTPausable for PausableUDT {
             .build());
     }
 
-    // #[ssri_method(level = "code", transaction = true)]
+    // #[ssri_method(level = "cell", transaction = true)]
     fn unpause(tx: Option<Transaction>, lock_hashes: &Vec<[u8; 32]>) -> Result<Transaction, Error> {
         let tx_builder = match tx {
             Some(ref tx) => tx.clone().as_builder(),
@@ -457,7 +455,6 @@ impl UDTPausable for PausableUDT {
         let pausable_data_vec: Vec<UDTPausableData> = Self::enumerate_paused(0, 0)?;
 
         let mut new_cell_output: CellOutput;
-        let new_output_data: UDTPausableData;
         let mut new_cell_input: Option<CellInput> = None;
         let mut output_data_vec_builder = match tx {
             Some(ref tx) => tx.clone().raw().outputs_data().as_builder(),
