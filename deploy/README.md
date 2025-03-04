@@ -84,3 +84,52 @@ caddy.exe reverse-proxy --from :9090 --to 192.168.160.20:9090
 ### faucet
 
 You can get USDI on testnet from [faucet](https://faucet.interpaystellar.com/).
+
+
+## mainnet
+
+### info
+
+Script of USDI is a upgradable xUDT now, we will upgrade it to Pausable-UDT later.
+
+So there is a realated [typeid](https://docs.nervos.org/docs/script/type-id).
+
+typeid info:
+
+```
+{
+    "code_hash": "0x00000000000000000000000000000000000000000000000000545950455f4944",
+    "hash_type": "type",
+    "args": "0x9105ea69838511ca609518d27855c53fed1b5ffaff4cfb334f58b40627d211c4"
+}
+```
+
+celldep will change after upgrade script, you can find latest info by pre typeid. current info is:
+
+```
+{
+    "outPoint": {
+        "txHash": "0xf6a5eef65101899db9709c8de1cc28f23c1bee90d857ebe176f6647ef109e20d",
+        "index": 0
+    },
+    "depType": "code"
+}
+```
+
+typescript of USDI
+
+```
+{
+    "code_hash": "0xbfa35a9c38a676682b65ade8f02be164d48632281477e36f8dc2f41f79e56bfc",
+    "hash_type": "type",
+    "args": "0xd591ebdc69626647e056e13345fd830c8b876bb06aa07ba610479eb77153ea9f"
+}
+```
+
+USDI identity (hash of pre typescript)
+
+```
+0x7f3fba3fb8d6e000176f7e1ae22e8cd02841dec6a8341dc69aeef46387a20664
+```
+
+it's identity of USDI on explorer, see https://explorer.nervos.org/xudt/0x7f3fba3fb8d6e000176f7e1ae22e8cd02841dec6a8341dc69aeef46387a20664
